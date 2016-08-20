@@ -1,0 +1,4 @@
+name = Modulo graficos BNV
+description = API de conexion a la base de datos, highcharts y bloques para graficar
+core = 7.x
+package = custom modules

@@ -1,0 +1,57 @@
+<?php 
+/**
+ * Implements hook_block_info().
+ */
+function graficos_bnv_block_info() {
+  $blocks['acciones'] = array(
+    // The name that will appear in the block list.
+    'info' => t('Actions'),
+    // Default setting.
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ * 
+ * Prepares the contents of the block.
+ */
+function graficos_bnv_block_view($delta = '') {
+  switch ($delta) { 
+    case 'acciones':
+    if(user_access('access content')){ //good idea to check user perms here
+      	$block['subject'] = t('Actions');
+      	$result = graficos_bnv_obtener_grafico('acciones');
+		drupal_add_js(array('graficos_bnv' => array('result' => $result)), array('type' => 'setting'));
+
+        $block['content'] = array(
+        		'#markup' => '<div class="grafico" id="acciones"></div>',
+        		'#attached' => array(
+        		  /*'css' => array(
+			        drupal_get_path('module', 'graficos_bnv') . '/css/mymodule.css',
+			      ),*/
+			      'js' => array(
+			        drupal_get_path('module', 'graficos_bnv') . '/js/graficos.js',
+			        drupal_get_path('module', 'graficos_bnv') . '/highcharts/js/highcharts.js',
+			        drupal_get_path('module', 'graficos_bnv') . '/highcharts/js/modules/exporting.js',
+			      ),
+			    ),
+        	);
+  		return $block;
+  	}
+  	break;
+  }  
+	//drupal_add_js(drupal_get_path('module', 'graficos_bnv') . '/js/graficos.js');
+}
+
+function graficos_bnv_obtener_grafico($tipo){
+  $url = 'http://dev.graficos.com/'.$tipo;
+  $options = array(
+    'method' => 'GET',
+    'header' => 'Content-Type: application/json',
+  );
+  $result = drupal_http_request($url, $options);
+  $data = drupal_json_decode($result->data);
+  return $data;
+}
